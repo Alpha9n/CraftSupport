@@ -1,0 +1,15 @@
+package pro.freeserver.alpha.plugin.craftsupporter;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+
+public class MainCommandClass implements CommandExecutor {
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (label.equalsIgnoreCase("craftsupporter") || label.equalsIgnoreCase("cs")){
+            sender.sendMessage("§a======§l§bCraftSuppoter§r§a======");
+        }
+        return false;
+    }
+}

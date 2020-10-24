@@ -1,0 +1,10 @@
+name: Craftsupporter
+version: ${project.version}
+main: pro.freeserver.alpha.plugin.craftsupporter.Craftsupporter
+api-version: 1.16
+authors: [ Alpha9n ]
+description: クラフトレシピを追加する汎用PL
+website: https://freeserver.pro/
+commands:
+  craftsupporter:
+    description: CraftSupporter
