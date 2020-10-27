@@ -23,7 +23,7 @@ public final class Craftsupporter extends JavaPlugin {
     }
 
     public void registerRecipe(){
-        FurnaceRecipe recipe = new FurnaceRecipe(new NamespacedKey(this,"chiffon_cake"),CraftRecipe.chiffonCake, new RecipeChoice.ExactChoice(CraftRecipe.kizi),0,5);
+        FurnaceRecipe recipe = new FurnaceRecipe(new NamespacedKey(this,"chiffon_cake"),CraftRecipe.chiffonCake, new RecipeChoice.ExactChoice(CraftRecipe.kizi),0,600);
         Bukkit.addRecipe(recipe);
     }
 }

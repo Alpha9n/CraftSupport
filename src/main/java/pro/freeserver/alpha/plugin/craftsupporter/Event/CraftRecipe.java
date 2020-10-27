@@ -65,19 +65,15 @@ public class CraftRecipe implements Listener {
     public void checkCraft(ItemStack result, CraftingInventory inv, List<ItemStack> ingredients) {
         ArrayList<ItemStack> matrix = new ArrayList<>(Arrays.asList(inv.getMatrix()));
         ArrayList<Integer> checkedList = new ArrayList<>();
-        boolean isContains = false;
         for (int matIndex = 0; matIndex < matrix.size(); matIndex++) {
             if (matrix.get(matIndex) != null){
                 boolean isPartial = false;
                 for (int ingIndex = 0; ingIndex < ingredients.size(); ingIndex++) {
                     ItemStack ingredient = ingredients.get(ingIndex);
-                    System.out.println("ingredient" + ingredient);
-                    System.out.println("matrix:" + matrix.get(matIndex));
                     if (!checkedList.contains(ingIndex)) {
                         ItemStack material = matrix.get(matIndex);
                         if (isPartialMatch(ingredient, material)) {
                             isPartial = true;
-                            isContains = true;
                             checkedList.add(ingIndex);
                             break;
                         }
@@ -86,7 +82,23 @@ public class CraftRecipe implements Listener {
                 if (!isPartial) return;
             }
         }
-        if (isContains) inv.setResult(result);
+        checkedList = new ArrayList<>();
+        for (int ingIndex = 0; ingIndex < ingredients.size(); ingIndex++) {
+            boolean isPartial = false;
+            for (int matIndex = 0; matIndex < matrix.size(); matIndex++) {
+                ItemStack ingredient = ingredients.get(ingIndex);
+                if (!checkedList.contains(ingIndex)) {
+                    ItemStack material = matrix.get(matIndex);
+                    if (isPartialMatch(ingredient, material)) {
+                        isPartial = true;
+                        checkedList.add(ingIndex);
+                        break;
+                    }
+                }
+            }
+            if (!isPartial) return;
+        }
+        inv.setResult(result);
     }
 
     //水入り瓶のアイテム作成
