@@ -10,7 +10,7 @@ public class MainCommandClass implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (label.equalsIgnoreCase("craftsupporter") || label.equalsIgnoreCase("cs")){
             if (sender instanceof Player){
-                sender.sendMessage("§a======§l§bCraftSuppoter§r§a======" + "\n生地\nピザ\nシフォンケーキ");
+                sender.sendMessage("§a======§l§bCraftSuppoter§r§a======" + "\n生地\nピザ\nシフォンケーキ\nみつかぼケーキ\nどんぶり\n皿");
             }
         }
         return false;

@@ -20,7 +20,10 @@ public class CraftRecipe implements Listener {
     //カスタムアイテム
     public static ItemStack kizi = getItemStack(Material.DEAD_BUSH, 1, "生地", Arrays.asList("§cこのままでは食べられないようだ..."), 1);
     public static ItemStack pizza = getItemStack(Material.PUMPKIN_PIE, 1, "ピザ", Arrays.asList("§bたくさん作ってみんなでシェアしよう!!"), 6);
-    public static ItemStack chiffonCake = getItemStack(Material.PUMPKIN_PIE, 1, "シフォンケーキ", Arrays.asList("§b最もシンプルでおいしいケーキ!!"), 1);
+    public static ItemStack chiffonCake = getItemStack(Material.PUMPKIN_PIE, 1, "シフォンケーキ", Arrays.asList("§6最もシンプルでおいしいケーキ!!"), 7);
+    public static ItemStack honey_chiffonCake = getItemStack(Material.PUMPKIN_PIE, 1, "みつかぼケーキ", Arrays.asList("§6とろーりはちみつがかかった甘くておいしいパンプキンケーキ"), 8);
+    public static ItemStack dish_plate = getItemStack(Material.BOWL, 1, "皿", Arrays.asList("§bいろいろな食べ物を載せられるお皿"), 1);
+    public static ItemStack donburi = getItemStack(Material.BOWL, 1, "丼", Arrays.asList("§bいろいろな食べ物を載せられる器","§6丼やカップケーキに最適"), 2);
 
     @EventHandler
     public void onPlayerCraftItem(PrepareItemCraftEvent e) {
@@ -41,6 +44,14 @@ public class CraftRecipe implements Listener {
                         new ItemStack(Material.RABBIT, 1),
                         new ItemStack(Material.KELP, 1),
                         kizi
+                ));
+        //みつかぶケーキ作成
+        checkCraft(honey_chiffonCake, e.getInventory(),
+                Arrays.asList(
+                        new ItemStack(Material.CARVED_PUMPKIN, 1),
+                        new ItemStack(Material.HONEY_BOTTLE, 1),
+                        kizi,
+                        donburi
                 ));
     }
 
@@ -124,15 +135,11 @@ public class CraftRecipe implements Listener {
     }
     public static boolean isPartialMatch(ItemStack fromItem, ItemStack toItem) {
         if ((fromItem == null) || (toItem == null)) {
-            System.out.println(1);
             return false;
         }
         if (!fromItem.getType().equals(toItem.getType())){
-            System.out.println(fromItem.getType());
-            System.out.println(toItem.getType());
             return false;
         }
-        System.out.println(fromItem.isSimilar(toItem));
         if (fromItem.isSimilar(toItem)) return true;
         ItemMeta fromMeta = fromItem.getItemMeta();
         ItemMeta toMeta = toItem.getItemMeta();
@@ -147,7 +154,6 @@ public class CraftRecipe implements Listener {
         }
 
         for (int i=0; i<fromContentList.size(); i++) {
-            System.out.println(i);
             Object content = fromContentList.get(i);
             if (content != null) {
                 if (toContentList.get(i) == null) return false;
@@ -187,16 +193,15 @@ public class CraftRecipe implements Listener {
             lore = null;
         }
 
-        List<Object> checkList = Arrays.asList(
-                equalsMeta.getAttributeModifiers(),
-                customModelData,
-                equalsMeta.getDestroyableKeys(),
-                displayName,
-                equalsMeta.getEnchants(),
-                localizedName,
-                lore,
-                equalsMeta.getPlaceableKeys()
-        );
+        List<Object> checkList = new ArrayList<>();
+        checkList.add(equalsMeta.getAttributeModifiers());
+        checkList.add(customModelData);
+        checkList.add(equalsMeta.getDestroyableKeys());
+        checkList.add(displayName);
+        checkList.add(equalsMeta.getEnchants());
+        checkList.add(localizedName);
+        checkList.add(lore);
+        checkList.add(equalsMeta.getPlaceableKeys());
         return checkList;
     }
 
