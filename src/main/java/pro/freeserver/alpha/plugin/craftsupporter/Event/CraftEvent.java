@@ -19,9 +19,9 @@ public class CraftEvent implements Listener {
         Player player = (Player) e.getWhoClicked();
         Recipe recipe = e.getRecipe();
 
-        System.out.println("今やよ～");
+        if(e.getRecipe().getResult().getItemMeta().hasLore() == false) return;
 
-        if(e.getRecipe().getResult().getLore().get(0).equalsIgnoreCase("§cこのままでは食べられないようだ...")){
+        else if(e.getRecipe().getResult().getLore().get(0).equalsIgnoreCase("§cこのままでは食べられないようだ...")){
             if (player.getInventory().firstEmpty() == -1) {
                 player.sendMessage("§f[§c重要§f]: §cインベントリに空きがないため地面に落とします。");
                 player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.GLASS_BOTTLE));

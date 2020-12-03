@@ -6,7 +6,7 @@
 
     <groupId>pro.freeserver.alpha.plugin</groupId>
     <artifactId>craftsupporter</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>Craftsupporter</name>

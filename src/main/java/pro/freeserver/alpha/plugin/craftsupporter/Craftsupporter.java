@@ -18,7 +18,6 @@ public final class Craftsupporter extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        getServer().resetRecipes();
         checkAlreadyRecipe();
         getServer().getPluginManager().registerEvents(new CraftEvent(),this);
         getCommand("CraftSupporter").setExecutor(new MainCommandClass());
