@@ -1,11 +1,12 @@
 package pro.freeserver.alpha.plugin.craftsupporter.Event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.inventory.CraftingInventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -16,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static pro.freeserver.alpha.plugin.craftsupporter.Craftsupporter.plugin;
+
 public class CraftRecipe implements Listener {
     //カスタムアイテム
     public static ItemStack kizi = getItemStack(Material.DEAD_BUSH, 1, "生地", Arrays.asList("§cこのままでは食べられないようだ..."), 1);
@@ -24,96 +27,70 @@ public class CraftRecipe implements Listener {
     public static ItemStack honey_chiffonCake = getItemStack(Material.PUMPKIN_PIE, 1, "みつかぼケーキ", Arrays.asList("§6とろーりはちみつがかかった甘くておいしいパンプキンケーキ"), 8);
     public static ItemStack dish_plate = getItemStack(Material.BOWL, 1, "皿", Arrays.asList("§bいろいろな食べ物を載せられるお皿"), 1);
     public static ItemStack donburi = getItemStack(Material.BOWL, 1, "丼", Arrays.asList("§bいろいろな食べ物を載せられる器","§6丼やカップケーキに最適"), 2);
+    private static ItemStack waterbottle = waterBottle();
+    Material type;
+    private static ItemStack air = new ItemStack(Material.AIR);
 
-    @EventHandler
-    public void onPlayerCraftItem(PrepareItemCraftEvent e) {
-        if (e.getInventory().getMatrix().length < 9) {
-            return;
-        }
-        //生地作成
-        checkCraft(kizi, e.getInventory(),
-                Arrays.asList(
-                        new ItemStack(Material.WHEAT, 1),
-                        waterBottle()
-                ));
-        //ピザ作成
-        checkCraft(pizza, e.getInventory(),
-                Arrays.asList(
-                        new ItemStack(Material.BEETROOT, 1),
-                        new ItemStack(Material.POTATO, 1),
-                        new ItemStack(Material.RABBIT, 1),
-                        new ItemStack(Material.KELP, 1),
-                        kizi
-                ));
-        //みつかぶケーキ作成
-        checkCraft(honey_chiffonCake, e.getInventory(),
-                Arrays.asList(
-                        new ItemStack(Material.CARVED_PUMPKIN, 1),
-                        new ItemStack(Material.HONEY_BOTTLE, 1),
-                        kizi,
-                        donburi
-                ));
+    //レシピリスト
+    private static List<ItemStack> rbdye = Arrays.asList(new ItemStack(Material.COAL));
+    private static List<ItemStack> rcbdye = Arrays.asList(new ItemStack(Material.CHARCOAL));
+    private static List<ItemStack> rkizi = Arrays.asList(new ItemStack(Material.WHEAT),waterbottle);
+    private static List<ItemStack> rpizza = Arrays.asList(new ItemStack(Material.BEETROOT),new ItemStack(Material.POTATO),new ItemStack(Material.RABBIT),new ItemStack(Material.KELP),kizi);
+    private static List<ItemStack> rhoneycake = Arrays.asList(new ItemStack(Material.CARVED_PUMPKIN),new ItemStack(Material.HONEY_BOTTLE),kizi,donburi);
+
+    public static void createRecipe() {
+        newFreeSlotRecipe("coalrecipe",new ItemStack(Material.BLACK_DYE,1),rbdye);
+        newFreeSlotRecipe("ccoalrecipe",new ItemStack(Material.BLACK_DYE,1),rcbdye);
+        newFreeSlotRecipe("kizirecipe",kizi,rkizi);
+        newFreeSlotRecipe("pizzarecipe",pizza,rpizza);
+        newFreeSlotRecipe("honeycakerecipe",honey_chiffonCake,rhoneycake);
+
+        newFurnace("chiffoncakerecipe",chiffonCake,kizi,1.0f,180);
     }
 
-    //クラフトが正しいかチェックしたのちに結果を出力するクラス(固定スロット)
-    public void slotFix(ItemStack result, CraftingInventory inv, HashMap<Integer, ItemStack> ingredients) {
-        ItemStack[] matrix = inv.getMatrix();
-        for (int i = 0; i < 9; i++) {
-            if (ingredients.containsKey(i)) {
-                if (matrix[i] == null || !matrix[i].equals(ingredients.get(i))) {
-                    return;
-                }
-            } else {
-                if (matrix[i] != null) {
-                    return;
-                }
-            }
-        }
-        inv.setResult(result);
+
+    //固定スロット(新)
+    public static void newSlotFixRecipe(){
+        //キー生成
+        NamespacedKey donburi_key = new NamespacedKey(plugin, "donburi");
+        NamespacedKey dish_key = new NamespacedKey(plugin, "dish");
+
+        //カスタムレシピ作成
+        ShapedRecipe donburi_recipe = new ShapedRecipe(donburi_key, CraftRecipe.donburi);
+        ShapedRecipe dish_recipe = new ShapedRecipe(dish_key, CraftRecipe.dish_plate);
+
+        //レシピの配置(固定)
+        donburi_recipe.shape("N N"," N ");
+        dish_recipe.shape("NNN");
+
+        //ショートカットの指定
+        //N = Nether_Brick_slab
+        donburi_recipe.setIngredient('N', Material.NETHER_BRICK_SLAB);
+        dish_recipe.setIngredient('N',Material.NETHER_BRICK_SLAB);
+
+        //Spigot側にアイテムレシピの受け渡し
+        Bukkit.addRecipe(donburi_recipe);
+        Bukkit.addRecipe(dish_recipe);
     }
 
-    //クラフトが正しいかチェックしたのちに結果を出力するクラス(変動スロット)
-    public void checkCraft(ItemStack result, CraftingInventory inv, List<ItemStack> ingredients) {
-        ArrayList<ItemStack> matrix = new ArrayList<>(Arrays.asList(inv.getMatrix()));
-        ArrayList<Integer> checkedList = new ArrayList<>();
-        for (int matIndex = 0; matIndex < matrix.size(); matIndex++) {
-            if (matrix.get(matIndex) != null){
-                boolean isPartial = false;
-                for (int ingIndex = 0; ingIndex < ingredients.size(); ingIndex++) {
-                    ItemStack ingredient = ingredients.get(ingIndex);
-                    if (!checkedList.contains(ingIndex)) {
-                        ItemStack material = matrix.get(matIndex);
-                        if (isPartialMatch(ingredient, material)) {
-                            isPartial = true;
-                            checkedList.add(ingIndex);
-                            break;
-                        }
-                    }
-                }
-                if (!isPartial) return;
-            }
+    //変動スロット(新)
+    public static void newFreeSlotRecipe(String recipeName, ItemStack result, List<ItemStack> ingredients){
+        if(ingredients.size()>9) return;
+        ShapelessRecipe slr = new ShapelessRecipe(NamespacedKey.minecraft(recipeName), result);
+        for(ItemStack ingredient: ingredients){
+            slr.addIngredient(ingredient);
         }
-        checkedList = new ArrayList<>();
-        for (int ingIndex = 0; ingIndex < ingredients.size(); ingIndex++) {
-            boolean isPartial = false;
-            for (int matIndex = 0; matIndex < matrix.size(); matIndex++) {
-                ItemStack ingredient = ingredients.get(ingIndex);
-                if (!checkedList.contains(ingIndex)) {
-                    ItemStack material = matrix.get(matIndex);
-                    if (isPartialMatch(ingredient, material)) {
-                        isPartial = true;
-                        checkedList.add(ingIndex);
-                        break;
-                    }
-                }
-            }
-            if (!isPartial) return;
-        }
-        inv.setResult(result);
+        Bukkit.getServer().addRecipe(slr);
+    }
+
+    //かまどレシピ(新)
+    public static void newFurnace(String recipeName, ItemStack result, ItemStack ingredient, float exp, int cookingTime){
+        FurnaceRecipe fr = new FurnaceRecipe(NamespacedKey.minecraft(recipeName), result, new RecipeChoice.ExactChoice(ingredient), exp, cookingTime);
+        Bukkit.getServer().addRecipe(fr);
     }
 
     //水入り瓶のアイテム作成
-    public ItemStack waterBottle() {
+    public static ItemStack waterBottle() {
         ItemStack bottle = new ItemStack(Material.POTION, 1);
         ItemMeta meta = bottle.getItemMeta();
         PotionMeta pmeta = (PotionMeta) meta;
@@ -123,7 +100,7 @@ public class CraftRecipe implements Listener {
         return bottle;
     }
 
-    //ここから下、人外未知のコード(tererunの)
+    // ItemStackAPI
     public static ItemStack getItemStack(Material material, int amount, String displayName, List<String> lore, int customModelData) {
         ItemStack itemStack = new ItemStack(material, amount);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -133,98 +110,4 @@ public class CraftRecipe implements Listener {
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
-    public static boolean isPartialMatch(ItemStack fromItem, ItemStack toItem) {
-        if ((fromItem == null) || (toItem == null)) {
-            return false;
-        }
-        if (!fromItem.getType().equals(toItem.getType())){
-            return false;
-        }
-        if (fromItem.isSimilar(toItem)) return true;
-        ItemMeta fromMeta = fromItem.getItemMeta();
-        ItemMeta toMeta = toItem.getItemMeta();
-        List<Object> fromContentList;
-        List<Object> toContentList;
-        if (fromMeta instanceof PotionMeta) {
-            fromContentList = getPotionContentList((PotionMeta) fromMeta);
-            toContentList = getPotionContentList((PotionMeta) toMeta);
-        } else {
-            fromContentList = getContentList(fromMeta);
-            toContentList = getContentList(toMeta);
-        }
-
-        for (int i=0; i<fromContentList.size(); i++) {
-            Object content = fromContentList.get(i);
-            if (content != null) {
-                if (toContentList.get(i) == null) return false;
-                if (!content.equals(toContentList.get(i))) return false;
-            }
-        }
-        return true;
-    }
-
-    private static List<Object> getContentList(ItemMeta equalsMeta) {
-        Object customModelData;
-        Object displayName;
-        Object localizedName;
-        Object lore;
-
-        if (equalsMeta.hasCustomModelData()) {
-            customModelData = equalsMeta.getCustomModelData();
-        } else {
-            customModelData = null;
-        }
-
-        if (equalsMeta.hasDisplayName()) {
-            displayName = equalsMeta.getDisplayName();
-        } else {
-            displayName = null;
-        }
-
-        if (equalsMeta.hasLocalizedName()) {
-            localizedName = equalsMeta.getLocalizedName();
-        } else {
-            localizedName = null;
-        }
-
-        if (equalsMeta.hasLore()) {
-            lore = equalsMeta.getLore();
-        } else {
-            lore = null;
-        }
-
-        List<Object> checkList = new ArrayList<>();
-        checkList.add(equalsMeta.getAttributeModifiers());
-        checkList.add(customModelData);
-        checkList.add(equalsMeta.getDestroyableKeys());
-        checkList.add(displayName);
-        checkList.add(equalsMeta.getEnchants());
-        checkList.add(localizedName);
-        checkList.add(lore);
-        checkList.add(equalsMeta.getPlaceableKeys());
-        return checkList;
-    }
-
-    private static List<Object> getPotionContentList(PotionMeta equalsMeta) {
-        List<Object> contentsList = getContentList(equalsMeta);
-        Object customEffects;
-        Object color;
-
-        if (equalsMeta.hasCustomEffects()) {
-            customEffects = equalsMeta.getCustomEffects();
-        } else {
-            customEffects = null;
-        }
-
-        if (equalsMeta.hasColor()) {
-            color = equalsMeta.getColor();
-        } else {
-            color = null;
-        }
-        contentsList.add(equalsMeta.getBasePotionData());
-        contentsList.add(customEffects);
-        contentsList.add(color);
-        return contentsList;
-    }
-
 }
