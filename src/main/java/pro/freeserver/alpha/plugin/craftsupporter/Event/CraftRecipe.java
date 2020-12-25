@@ -27,8 +27,9 @@ public class CraftRecipe implements Listener {
     public static ItemStack honey_chiffonCake = getItemStack(Material.PUMPKIN_PIE, 1, "みつかぼケーキ", Arrays.asList("§6とろーりはちみつがかかった甘くておいしいパンプキンケーキ"), 8);
     public static ItemStack dish_plate = getItemStack(Material.BOWL, 1, "皿", Arrays.asList("§bいろいろな食べ物を載せられるお皿"), 1);
     public static ItemStack donburi = getItemStack(Material.BOWL, 1, "丼", Arrays.asList("§bいろいろな食べ物を載せられる器","§6丼やカップケーキに最適"), 2);
+    public static ItemStack eggliquid = getItemStack(Material.BEETROOT_SOUP, 1, "ボウルに入った卵液", Arrays.asList("§b卵を溶いただけの液体"), 1);
+    public static ItemStack omelet = getItemStack(Material.PUMPKIN_PIE,1,"オムレツ",Arrays.asList("§6おいしいオムレツだ"),9);
     private static ItemStack waterbottle = waterBottle();
-    Material type;
     private static ItemStack air = new ItemStack(Material.AIR);
 
     //レシピリスト
@@ -37,6 +38,7 @@ public class CraftRecipe implements Listener {
     private static List<ItemStack> rkizi = Arrays.asList(new ItemStack(Material.WHEAT),waterbottle);
     private static List<ItemStack> rpizza = Arrays.asList(new ItemStack(Material.BEETROOT),new ItemStack(Material.POTATO),new ItemStack(Material.RABBIT),new ItemStack(Material.KELP),kizi);
     private static List<ItemStack> rhoneycake = Arrays.asList(new ItemStack(Material.CARVED_PUMPKIN),new ItemStack(Material.HONEY_BOTTLE),kizi,donburi);
+    private static List<ItemStack> reggrequid = Arrays.asList(new ItemStack(Material.EGG));
 
     public static void createRecipe() {
         newFreeSlotRecipe("coalrecipe",new ItemStack(Material.BLACK_DYE,1),rbdye);
@@ -44,8 +46,10 @@ public class CraftRecipe implements Listener {
         newFreeSlotRecipe("kizirecipe",kizi,rkizi);
         newFreeSlotRecipe("pizzarecipe",pizza,rpizza);
         newFreeSlotRecipe("honeycakerecipe",honey_chiffonCake,rhoneycake);
+        newFreeSlotRecipe("eggrequid",eggliquid,reggrequid);
 
         newFurnace("chiffoncakerecipe",chiffonCake,kizi,1.0f,180);
+        newFurnace("omelet",omelet,eggliquid,1.0f,20);
     }
 
 
